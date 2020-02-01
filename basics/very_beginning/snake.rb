@@ -37,13 +37,17 @@ class Snake
     case @direction
     when 'down'
       # adding one to y in snake head
-      @positions.push([head[0], head[1] + 1])
+      @positions.push([head[0] % 32,
+                       (head[1] + 1) % 24])
     when 'up'
-      @positions.push([head[0], head[1] - 1])
+      @positions.push([head[0] % 32,
+                       (head[1] - 1) % 24])
     when 'left'
-      @positions.push([head[0] - 1, head[1] ])
+      @positions.push([(head[0] - 1) % 32,
+                       head[1] % 24 ])
     when 'right'
-      @positions.push([head[0] + 1, head[1]])
+      @positions.push([(head[0] + 1) % 32,
+                       head[1] % 24])
     end
   end
 
@@ -65,6 +69,7 @@ end
 
 # reading the user keys and assign it to snake position
 on :key_down do |event|
+  # just if the key pressed is within the list then direction will change
   moves = %w(up down right left)
   if moves.include?(event.key)
     snake.direction = event.key
