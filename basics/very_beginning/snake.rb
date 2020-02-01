@@ -11,9 +11,14 @@ GRID_SIZE = 20
 
 # This class represents the snake while gaming
 class Snake
+
   def initialize
     @positions = [[2, 0], [2, 1], [2, 2], [2, 3]]
     @direction = 'down'
+  end
+
+  def direction=(new_direction)
+    @direction = new_direction
   end
 
   # This function will draw the snake every frame
@@ -32,8 +37,13 @@ class Snake
     case @direction
     when 'down'
       # adding one to y in snake head
-      next_head_pos = [head[0], head[1] + 1]
-      @positions.push(next_head_pos)
+      @positions.push([head[0], head[1] + 1])
+    when 'up'
+      @positions.push([head[0], head[1] - 1])
+    when 'left'
+      @positions.push([head[0] - 1, head[1] ])
+    when 'right'
+      @positions.push([head[0] + 1, head[1]])
     end
   end
 
@@ -53,4 +63,11 @@ update do
   snake.draw
 end
 
+# reading the user keys and assign it to snake position
+on :key_down do |event|
+  moves = %w(up down right left)
+  if moves.include?(event.key)
+    snake.direction = event.key
+  end
+end
 show
