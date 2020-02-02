@@ -14,7 +14,7 @@ GRID_WIDTH = 32
 # This class represents the snake while gaming
 class Snake
   # adding setters and getters
-  attr_reader :direction
+  attr_reader :direction, :positions
   attr_writer :direction
 
   def initialize
@@ -66,6 +66,10 @@ class Snake
     value
   end
 
+  def add_tail
+    @positions.unshift([tail[0], tail[1]])
+  end
+
   # returns snake head in x position
   def x
     head[0]
@@ -82,14 +86,30 @@ class Snake
   def head
     @positions.last
   end
+
+  def tail
+    @positions.first
+  end
 end
 
 # this class represents the game logic
 class Game
+  attr_reader :pause
+  attr_writer :pause
+
   def initialize
     @score = 0
     @food_x = rand(GRID_WIDTH)
     @food_y = rand(GRID_HEIGHT)
+    @pause = false
+  end
+
+  def pause_or_not
+    @pause = !@pause
+    if @pause
+      Text.new("Game Paused", color: "red",
+               x: ((GRID_WIDTH / 2) * GRID_SIZE) - 150, y: ((GRID_HEIGHT / 2) * GRID_SIZE) - 50, size:50)
+    end
   end
 
   # draw the food into the game screen
@@ -104,20 +124,32 @@ class Game
 
   # determine whether snake head position is same than food or not
   def snake_hit_food?(snake_x, snake_y)
-    value = false
-    if snake_x == @food_x && snake_y == @food_y
-      value = true
-    end
-    value
+    snake_x == @food_x && snake_y == @food_y
   end
 
   # actions that proceeds after user hits the food
-  def record_hit
+  def record_hit(snake_positions)
     # increasing the user score
     @score += 1
     # new food position
-    @food_x = rand(GRID_WIDTH)
-    @food_y = rand(GRID_HEIGHT)
+    in_process = true
+    test_food_x = 0
+    test_food_y = 0
+    # food never will apear in a position equals to some location
+    # of snake body
+    while in_process
+      test_food_x = rand(GRID_WIDTH)
+      test_food_y = rand(GRID_HEIGHT)
+      food_is_crossed = false
+      snake_positions.each do |pos|
+        food_is_crossed = pos[0] == test_food_x && pos[1] == test_food_y
+      end
+      unless food_is_crossed
+        in_process = false
+      end
+    end
+    @food_x = test_food_x
+    @food_y = test_food_y
   end
 end
 
@@ -126,12 +158,15 @@ game = Game.new
 
 # game loop logic
 update do
-  clear
-  snake.move
-  game.draw
-  snake.draw
-  if game.snake_hit_food?(snake.x, snake.y)
-    game.record_hit
+  unless game.pause
+    clear
+    snake.move
+    game.draw
+    snake.draw
+    if game.snake_hit_food?(snake.x, snake.y)
+      game.record_hit(snake.positions)
+      snake.add_tail
+    end
   end
 end
 
@@ -143,6 +178,9 @@ on :key_down do |event|
     if snake.snake_can_change_direction?(event.key)
       snake.direction = event.key
     end
+  end
+  if event.key == "p"
+    game.pause_or_not
   end
 end
 
