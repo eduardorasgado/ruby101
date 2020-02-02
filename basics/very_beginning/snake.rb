@@ -1,15 +1,20 @@
 require 'ruby2d'
 
+RAW_HEIGHT = 240
+RAW_WIDTH = 320
+
 set title: 'Snake Game'
 set background: 'navy'
+set height: RAW_HEIGHT
+set width: RAW_WIDTH
 set fps_cap: 5
 
 # height: 480 / 20 = 24
 # width: 640 / 20 = 32
 
 GRID_SIZE = 20
-GRID_HEIGHT = 24
-GRID_WIDTH = 32
+GRID_HEIGHT = RAW_HEIGHT / GRID_SIZE
+GRID_WIDTH = RAW_WIDTH / GRID_SIZE
 
 # This class represents the snake while gaming
 class Snake
@@ -50,6 +55,8 @@ class Snake
     when 'right'
       @positions.push([(head[0] + 1) % GRID_WIDTH,
                        head[1]])
+    else
+      puts 'error: another key inside case else'
     end
   end
 
@@ -142,7 +149,9 @@ class Game
       test_food_y = rand(GRID_HEIGHT)
       food_is_crossed = false
       snake_positions.each do |pos|
-        food_is_crossed = pos[0] == test_food_x && pos[1] == test_food_y
+        if pos[0] == test_food_x && pos[1] == test_food_y
+        food_is_crossed = true
+        end
       end
       unless food_is_crossed
         in_process = false
