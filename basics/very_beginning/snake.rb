@@ -185,6 +185,7 @@ class Game
   end
 end
 
+# initializing game objects for the first time
 snake = Snake.new
 game = Game.new
 
@@ -201,6 +202,7 @@ update do
     end
 
     if snake.hit_itself?
+      clear
       # show a text. Restart the snake game
       # pause the game
       game.show_game_over_message
