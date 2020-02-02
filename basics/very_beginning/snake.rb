@@ -41,6 +41,7 @@ class Snake
   def move
     # removing first element from the snake body
     unless @is_growing
+      # list.shift removes the first element within a list
       @positions.shift
     end
     # after growing, snake should stop growing, it grows one at a time
@@ -48,6 +49,7 @@ class Snake
     # reading direction
     case @direction
     when 'down'
+      # push insert an element in last position of the list
       # adding one to y in snake head
       @positions.push([head[0],
                        (head[1] + 1) % GRID_HEIGHT])
@@ -80,6 +82,7 @@ class Snake
 
   # return true if head list is same as another but not himself
   def hit_itself?
+    # list.uniq removes all repeated elements from a list
     @positions.uniq.length != @positions.length
   end
 
