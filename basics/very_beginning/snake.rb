@@ -111,7 +111,7 @@ end
 
 # this class represents the game logic
 class Game
-
+  @@max_score = 0
   attr_reader :pause
   attr_writer :pause
 
@@ -176,8 +176,12 @@ class Game
 
   # to show a message when player has lost
   def show_game_over_message
+    if @score > @@max_score
+      @@max_score = @score
+    end
     Text.new("Game over", color: "red", x: 200, y: 150, size: 50)
-    Text.new("Score: #{@score}", color: "blue", x: 200, y: 300, size: 50)
+    Text.new("Score: #{@score}, max score: #{@@max_score}",
+             color: "blue", x: 120, y: 300, size: 25)
   end
 end
 
