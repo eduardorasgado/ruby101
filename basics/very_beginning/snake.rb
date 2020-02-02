@@ -11,14 +11,13 @@ GRID_SIZE = 20
 
 # This class represents the snake while gaming
 class Snake
+  # adding setters and getters
+  attr_reader :direction
+  attr_writer :direction
 
   def initialize
     @positions = [[2, 0], [2, 1], [2, 2], [2, 3]]
     @direction = 'down'
-  end
-
-  def direction=(new_direction)
-    @direction = new_direction
   end
 
   # This function will draw the snake every frame
@@ -71,8 +70,16 @@ end
 on :key_down do |event|
   # just if the key pressed is within the list then direction will change
   moves = %w(up down right left)
+  # to be able to check the next direction is not opossite to actual direction
+  move_patterns = [%w(up down), %w(right left)]
   if moves.include?(event.key)
-    snake.direction = event.key
+    move_patterns.each do |move|
+      if move.include?(event.key)
+        unless move.include?(event.key) && move.include?(snake.direction)
+          snake.direction = event.key
+        end
+      end
+    end
   end
 end
 show
