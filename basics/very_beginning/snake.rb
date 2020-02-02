@@ -18,6 +18,7 @@ class Snake
   def initialize
     @positions = [[2, 0], [2, 1], [2, 2], [2, 3]]
     @direction = 'down'
+    @move_patterns = [%w(up down), %w(right left)]
   end
 
   # This function will draw the snake every frame
@@ -50,6 +51,19 @@ class Snake
     end
   end
 
+  # method to be able to check the next direction is not opossite to actual direction
+  def snake_can_change_direction?(key)
+    value = false
+    @move_patterns.each do |move|
+      if move.include?(key)
+        unless move.include?(key) && move.include?(@direction)
+          value = true
+        end
+      end
+    end
+    value
+  end
+
   private
 
   # returns the snake head position list
@@ -70,15 +84,9 @@ end
 on :key_down do |event|
   # just if the key pressed is within the list then direction will change
   moves = %w(up down right left)
-  # to be able to check the next direction is not opossite to actual direction
-  move_patterns = [%w(up down), %w(right left)]
   if moves.include?(event.key)
-    move_patterns.each do |move|
-      if move.include?(event.key)
-        unless move.include?(event.key) && move.include?(snake.direction)
-          snake.direction = event.key
-        end
-      end
+    if snake.snake_can_change_direction?(event.key)
+      snake.direction = event.key
     end
   end
 end
