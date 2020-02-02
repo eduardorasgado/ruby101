@@ -111,6 +111,7 @@ end
 
 # this class represents the game logic
 class Game
+
   attr_reader :pause
   attr_writer :pause
 
@@ -176,6 +177,7 @@ class Game
   # to show a message when player has lost
   def show_game_over_message
     Text.new("Game over", color: "red", x: 200, y: 150, size: 50)
+    Text.new("Score: #{@score}", color: "blue", x: 200, y: 300, size: 50)
   end
 end
 
@@ -198,6 +200,9 @@ update do
       # show a text. Restart the snake game
       # pause the game
       game.show_game_over_message
+      game.pause_or_not
+      snake = Snake.new
+      game = Game.new
       game.pause_or_not
     end
   end
