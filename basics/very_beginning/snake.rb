@@ -1,7 +1,7 @@
 require 'ruby2d'
 
-RAW_HEIGHT = 240
-RAW_WIDTH = 320
+RAW_HEIGHT = 240 * 2
+RAW_WIDTH = 320 * 2
 
 set title: 'Snake Game'
 set background: 'navy'
@@ -19,13 +19,14 @@ GRID_WIDTH = RAW_WIDTH / GRID_SIZE
 # This class represents the snake while gaming
 class Snake
   # adding setters and getters
-  attr_reader :direction, :positions
-  attr_writer :direction
+  attr_reader :direction, :positions, :is_growing
+  attr_writer :direction, :is_growing
 
   def initialize
     @positions = [[2, 0], [2, 1], [2, 2], [2, 3]]
     @direction = 'down'
     @move_patterns = [%w(up down), %w(right left)]
+    @is_growing = false
   end
 
   # This function will draw the snake every frame
@@ -39,7 +40,11 @@ class Snake
   # reading direction that user gives the snake
   def move
     # removing first element from the snake body
-    @positions.shift
+    unless @is_growing
+      @positions.shift
+    end
+    # after growing, snake should stop growing, it grows one at a time
+    @is_growing = false
     # reading direction
     case @direction
     when 'down'
@@ -73,8 +78,14 @@ class Snake
     value
   end
 
-  def add_tail
-    @positions.unshift([tail[0], tail[1]])
+  # return true if head list is same as another but not himself
+  def hit_itself?
+    @positions.uniq.length != @positions.length
+  end
+
+  # to be able to avoid position list shifts
+  def grow
+    @is_growing =true
   end
 
   # returns snake head in x position
@@ -93,10 +104,6 @@ class Snake
   def head
     @positions.last
   end
-
-  def tail
-    @positions.first
-  end
 end
 
 # this class represents the game logic
@@ -111,11 +118,13 @@ class Game
     @pause = false
   end
 
+  # pause or continue the game
   def pause_or_not
     @pause = !@pause
     if @pause
-      Text.new("Game Paused", color: "red",
-               x: ((GRID_WIDTH / 2) * GRID_SIZE) - 150, y: ((GRID_HEIGHT / 2) * GRID_SIZE) - 50, size:50)
+      Text.new("Game Paused, press (p) to continue", color: "red",
+               x: ((GRID_WIDTH / 2) * GRID_SIZE) - 200,
+               y: ((GRID_HEIGHT / 2) * GRID_SIZE), size:25)
     end
   end
 
@@ -160,6 +169,11 @@ class Game
     @food_x = test_food_x
     @food_y = test_food_y
   end
+
+  # to show a message when player has lost
+  def show_game_over_message
+    Text.new("Game over", color: "red", x: 200, y: 150, size: 50)
+  end
 end
 
 snake = Snake.new
@@ -174,7 +188,14 @@ update do
     snake.draw
     if game.snake_hit_food?(snake.x, snake.y)
       game.record_hit(snake.positions)
-      snake.add_tail
+      snake.grow
+    end
+
+    if snake.hit_itself?
+      # show a text. Restart the snake game
+      # pause the game
+      game.show_game_over_message
+      game.pause_or_not
     end
   end
 end
